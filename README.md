@@ -110,6 +110,3 @@ User chọn phòng/thiết bị + thời gian
   → User nhận kết quả qua thông báo
 ```
 
-## License
-
-MIT
