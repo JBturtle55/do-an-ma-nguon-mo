@@ -2,6 +2,8 @@
 
 Đồ án môn học Mã nguồn mở — Hệ thống web quản lý và đặt lịch phòng thực hành, thiết bị dành cho trường học / trung tâm đào tạo.
 
+**Demo:** https://management.longvan.vn
+
 ## Tính năng
 
 - **Đặt lịch phòng & thiết bị** — chọn Ca nhanh (Ca 1–5) hoặc tự chọn giờ, kiểm tra conflict real-time
