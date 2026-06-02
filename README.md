@@ -5,7 +5,7 @@
 ## Tính năng
 
 - **Đặt lịch phòng & thiết bị** — chọn Ca nhanh (Ca 1–5) hoặc tự chọn giờ, kiểm tra conflict real-time
-- **3 vai trò người dùng** — Admin, Giảng viên với quyền hạn khác nhau
+- **2 vai trò người dùng** — Admin, User với quyền hạn khác nhau
 - **Duyệt booking** — Admin xem danh sách chờ duyệt, duyệt hoặc từ chối kèm ghi chú
 - **Lịch tổng quan** — giao diện thời khóa biểu đại học (15 tiết × 7 ngày)
 - **Thông báo** — email + database notification khi booking được tạo/duyệt/từ chối
@@ -71,9 +71,8 @@ Truy cập tại `http://localhost:8000`
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | admin@lab.test | password |
-| Giảng viên | lecturer@lab.test | password |
-| Sinh viên | student@lab.test | password |
+| Admin | admin@gmail.com | password |
+| Giảng viên | user@gmail.com | password |
 
 ## Cấu trúc thư mục chính
 
