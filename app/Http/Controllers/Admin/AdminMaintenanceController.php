@@ -8,7 +8,7 @@ use App\Models\MaintenanceLog;
 use App\Models\Room;
 use App\Models\User;
 use App\Notifications\BookingAffectedByMaintenanceNotification;
-use App\Notifications\MaintenanceReportedNotification;
+use App\Notifications\MaintenanceResolvedNotification;
 use App\Notifications\MaintenanceStatusChangedNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -59,8 +59,10 @@ class AdminMaintenanceController extends Controller
         // Mark the room/equipment as under maintenance so it can't be booked
         $log->loggable->update(['status' => 'maintenance']);
 
-        Notification::send(User::role('admin')->get(), new MaintenanceReportedNotification($log));
-        Notification::send(User::whereDoesntHave('roles', fn ($q) => $q->where('name', 'admin'))->get(), new BookingAffectedByMaintenanceNotification($log));
+        Notification::send(
+            User::whereDoesntHave('roles', fn ($q) => $q->where('name', 'admin'))->get(),
+            new BookingAffectedByMaintenanceNotification($log)
+        );
 
         return redirect()->route('admin.maintenance.index')->with('success', 'Đã báo cáo sự cố thành công.');
     }
@@ -88,6 +90,10 @@ class AdminMaintenanceController extends Controller
 
         if (!$hasActiveLog) {
             $log->loggable->update(['status' => 'available']);
+            Notification::send(
+                User::whereDoesntHave('roles', fn ($q) => $q->where('name', 'admin'))->get(),
+                new MaintenanceResolvedNotification($log)
+            );
         }
 
         $this->notifyStatusChange($log);
@@ -97,6 +103,12 @@ class AdminMaintenanceController extends Controller
 
     private function notifyStatusChange(MaintenanceLog $log): void
     {
-        Notification::send(User::role('admin')->get(), new MaintenanceStatusChangedNotification($log));
+        // resolved is handled separately with MaintenanceResolvedNotification
+        if ($log->status !== 'resolved') {
+            Notification::send(
+                User::whereDoesntHave('roles', fn ($q) => $q->where('name', 'admin'))->get(),
+                new MaintenanceStatusChangedNotification($log)
+            );
+        }
     }
 }
