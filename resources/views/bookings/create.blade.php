@@ -59,7 +59,7 @@
             {{-- Ngày --}}
             <div class="mb-3">
                 <label class="form-label">Ngày <span class="text-red-500">*</span></label>
-                <input type="date" x-model="selectedDate" @change="syncFromDate()" class="form-input w-48">
+                <input type="date" x-model="selectedDate" @change="syncFromDate()" min="{{ now()->toDateString() }}" class="form-input w-48">
             </div>
 
             {{-- Chọn ca nhanh --}}
@@ -173,6 +173,7 @@ function bookingForm() {
             this.bookableId = '';
             this.availabilityChecked = false;
             this.isMaintenance = false;
+            this.selectedSlots = [];
         },
 
         selectSlot(slot) {
@@ -256,6 +257,11 @@ function bookingForm() {
 
         submitForm(e) {
             if (!this.bookableId || !this.startTime || !this.endTime) return;
+            if (this.endTime <= this.startTime) {
+                e.preventDefault();
+                alert('Giờ kết thúc phải sau giờ bắt đầu.');
+                return;
+            }
             if (!this.availabilityChecked) {
                 e.preventDefault();
                 alert('Vui lòng đợi kiểm tra lịch trống trước khi gửi.');

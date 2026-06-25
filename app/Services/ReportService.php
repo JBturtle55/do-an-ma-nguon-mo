@@ -89,7 +89,7 @@ class ReportService
         return DB::table('bookings')
             ->join('users', 'bookings.user_id', '=', 'users.id')
             ->whereBetween('bookings.start_time', [$from, $to])
-            ->whereIn('bookings.status', ['approved', 'pending'])
+            ->where('bookings.status', 'approved')
             ->select('users.id as user_id', 'users.name', DB::raw('COUNT(*) as count'))
             ->groupBy('users.id', 'users.name')
             ->orderByDesc('count')
