@@ -26,10 +26,10 @@ class BookingAffectedByMaintenanceNotification extends Notification implements S
         return (new MailMessage)
             ->subject('Thông báo bảo trì: ' . $name)
             ->greeting('Xin chào ' . $notifiable->name)
-            ->line('Phòng/thiết bị bạn đã đặt đang gặp sự cố và tạm thời không khả dụng.')
-            ->line('**' . $name . '** — ' . $this->log->description)
-            ->line('Vui lòng liên hệ quản trị viên hoặc đặt lại lịch sang phòng/thiết bị khác.')
-            ->action('Xem lịch đặt của tôi', url('/bookings'));
+            ->line('**' . $name . '** hiện đang trong quá trình bảo trì và tạm thời không thể đặt lịch.')
+            ->line('**Lý do:** ' . $this->log->description)
+            ->line('Vui lòng chọn phòng/thiết bị khác hoặc liên hệ quản trị viên để biết thêm thông tin.')
+            ->action('Đặt lịch mới', url('/bookings/create'));
     }
 
     public function toDatabase(object $notifiable): array
@@ -37,9 +37,9 @@ class BookingAffectedByMaintenanceNotification extends Notification implements S
         $name = $this->log->loggable?->name ?? 'Không xác định';
 
         return [
-            'type'    => 'booking_affected_by_maintenance',
+            'type'    => 'maintenance_notice',
             'log_id'  => $this->log->id,
-            'message' => $name . ' đang bảo trì — booking của bạn có thể bị ảnh hưởng.',
+            'message' => $name . ' đang bảo trì và tạm thời không thể đặt lịch.',
         ];
     }
 }
