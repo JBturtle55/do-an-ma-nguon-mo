@@ -247,6 +247,67 @@ Route::get('/api/availability/check', [AvailabilityController::class, 'check'])-
 - **show() methods**: `AdminRoomController`, `AdminEquipmentController`, `AdminMaintenanceController` đều có `show()` — `Route::resource()` tự đăng ký route nhưng phải có method tương ứng, không thì 500.
 - **Export CSV**: `ReportService::exportCsv()` hỗ trợ 3 loại: `utilization`, `summary`, `top_users`. Header CSV tiếng Việt + UTF-8 BOM cho Excel.
 
+### Maintenance Status Sync — quan trọng
+
+Khi tạo/resolve maintenance log, status của room/equipment phải được sync thủ công (không tự động):
+
+- `AdminMaintenanceController::store()` → sau khi lưu log, gọi `$log->loggable->update(['status' => 'maintenance'])`
+- `AdminMaintenanceController::resolve()` → chỉ restore `'available'` khi **không còn** active log nào khác:
+  ```php
+  $hasActiveLog = MaintenanceLog::where('loggable_type', $log->loggable_type)
+      ->where('loggable_id', $log->loggable_id)
+      ->whereIn('status', ['open', 'in_progress'])
+      ->exists();
+  if (!$hasActiveLog) {
+      $log->loggable->update(['status' => 'available']);
+  }
+  ```
+- **Belt-and-suspenders**: `AvailabilityService::isStatusBookable()` kiểm tra **cả 2**: status field === `'available'` **và** không có active maintenance log. Điều này bảo vệ trường hợp status field bị desync (ví dụ log tạo trước khi fix được deploy).
+- `AvailabilityController::check()` trả về `['available' => false, 'maintenance' => true]` khi đang bảo trì.
+- `BookingService::create()` có server-side guard: throw `BookingConflictException` nếu `isStatusBookable()` = false (trước khi pessimistic lock).
+- **Data backfill**: nếu có legacy log tạo trước fix, chạy script để sync: tìm tất cả room/equipment có active log nhưng status = `'available'` và update về `'maintenance'`.
+
+### Alpine.js Modals — pattern chuẩn
+
+Tất cả confirm dialog đã được chuyển từ `onsubmit="return confirm()"` sang Alpine.js custom modal. Pattern cố định:
+
+- **2 element riêng biệt**: backdrop (chỉ fade) + panel wrapper (scale-95+fade)
+- **Inline style cho width**: `style="width:400px;max-width:calc(100vw - 2rem)"` — **không** dùng Tailwind `max-w-*` vì có thể bị purge khỏi CSS production nếu class không xuất hiện ở nơi khác
+- **Compact layout**: icon (w-7 h-7) + title/subtitle + X button trong flex row; không có `border-b` separator; padding đồng đều `px-4`
+- `@keydown.escape.window` để đóng bằng ESC
+- Backdrop `@click` đóng; panel `@click.stop` ngăn bubble
+
+```html
+{{-- Backdrop --}}
+<div x-show="open" @click="open = false"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+     class="fixed inset-0 bg-black/40 z-50" style="display:none"></div>
+{{-- Panel --}}
+<div x-show="open"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+     x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none" style="display:none">
+    <div class="bg-white rounded-xl shadow-xl pointer-events-auto"
+         style="width:400px;max-width:calc(100vw - 2rem)" @click.stop>
+        ...
+    </div>
+</div>
+```
+
+### Alert Component (`components/alert.blade.php`)
+
+- 4 type: `success`, `error`, `warning`, `conflict` — đều có Alpine `x-show` + slide-down-fade transition
+- Enter: `opacity-0 -translate-y-2` → `opacity-100 translate-y-0` (300ms ease-out)
+- Close (X) button trên tất cả type
+- Success auto-dismiss sau 4500ms (`setTimeout(() => show = false, 4500)`)
+
 ---
 
 ## Key Routes Structure

@@ -55,6 +55,9 @@ class AdminMaintenanceController extends Controller
             'status'      => 'open',
         ]));
 
+        // Mark the room/equipment as under maintenance so it can't be booked
+        $log->loggable->update(['status' => 'maintenance']);
+
         Notification::send(User::role('admin')->get(), new MaintenanceReportedNotification($log));
 
         return redirect()->route('admin.maintenance.index')->with('success', 'Đã báo cáo sự cố thành công.');
@@ -74,6 +77,16 @@ class AdminMaintenanceController extends Controller
     {
         $log->load('loggable');
         $log->update(['status' => 'resolved', 'resolved_at' => now()]);
+
+        // Restore status only when no other active logs remain for this item
+        $hasActiveLog = MaintenanceLog::where('loggable_type', $log->loggable_type)
+            ->where('loggable_id', $log->loggable_id)
+            ->whereIn('status', ['open', 'in_progress'])
+            ->exists();
+
+        if (!$hasActiveLog) {
+            $log->loggable->update(['status' => 'available']);
+        }
 
         $this->notifyStatusChange($log);
 

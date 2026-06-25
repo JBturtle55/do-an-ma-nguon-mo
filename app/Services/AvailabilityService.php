@@ -11,7 +11,26 @@ class AvailabilityService
 {
     public function isAvailable(string $bookableType, int $bookableId, Carbon $start, Carbon $end): bool
     {
+        if (!$this->isStatusBookable($bookableType, $bookableId)) {
+            return false;
+        }
+
         return $this->getConflicts($bookableType, $bookableId, $start, $end)->isEmpty();
+    }
+
+    public function isStatusBookable(string $bookableType, int $bookableId): bool
+    {
+        $model = $bookableType::find($bookableId);
+        if (!$model || $model->status !== 'available') {
+            return false;
+        }
+
+        // Belt-and-suspenders: block if there's an active maintenance log even if
+        // the status field wasn't synced (e.g. log created before this check existed)
+        return !\App\Models\MaintenanceLog::where('loggable_type', $bookableType)
+            ->where('loggable_id', $bookableId)
+            ->whereIn('status', ['open', 'in_progress'])
+            ->exists();
     }
 
     public function getConflicts(string $bookableType, int $bookableId, Carbon $start, Carbon $end): Collection

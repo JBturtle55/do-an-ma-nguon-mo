@@ -40,7 +40,13 @@
 
                         {{-- Dropdown --}}
                         <div x-show="open" @click.outside="open = false"
-                             class="absolute right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 z-50"
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                             class="absolute right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 z-50"
                              style="display:none; width:320px; min-width:320px;">
                             <div class="px-4 py-2 border-b border-gray-100 flex items-center justify-between">
                                 <span class="text-sm font-semibold text-gray-700">Thông báo</span>
@@ -80,8 +86,14 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
-                        <div x-show="open" @click.outside="open = false" x-transition
-                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-50" style="display:none">
+                        <div x-show="open" @click.outside="open = false"
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-50" style="display:none">
                             <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Hồ sơ cá nhân</a>
                             <hr class="my-1 border-gray-100">
                             <form method="POST" action="{{ route('logout') }}">

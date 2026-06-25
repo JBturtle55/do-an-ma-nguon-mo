@@ -22,8 +22,18 @@ class AvailabilityController extends Controller
             'exclude_id'    => 'nullable|integer',
         ]);
 
-        $start     = Carbon::parse($request->start_time);
-        $end       = Carbon::parse($request->end_time);
+        $start = Carbon::parse($request->start_time);
+        $end   = Carbon::parse($request->end_time);
+
+        // Check room/equipment status before checking booking conflicts
+        if (!$this->availabilityService->isStatusBookable($request->bookable_type, $request->bookable_id)) {
+            return response()->json([
+                'available'   => false,
+                'maintenance' => true,
+                'conflicts'   => [],
+            ]);
+        }
+
         $conflicts = $this->availabilityService->getConflicts(
             $request->bookable_type,
             $request->bookable_id,
@@ -36,8 +46,9 @@ class AvailabilityController extends Controller
         }
 
         return response()->json([
-            'available' => $conflicts->isEmpty(),
-            'conflicts' => $conflicts->map(fn ($b) => [
+            'available'   => $conflicts->isEmpty(),
+            'maintenance' => false,
+            'conflicts'   => $conflicts->map(fn ($b) => [
                 'id'         => $b->id,
                 'title'      => $b->title,
                 'start_time' => $b->start_time->toIso8601String(),

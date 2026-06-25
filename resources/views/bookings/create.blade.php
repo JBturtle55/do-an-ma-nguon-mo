@@ -101,11 +101,14 @@
 
             {{-- Availability indicator --}}
             <div x-show="availabilityChecked" class="mb-4 p-3 rounded-lg text-sm"
-                 :class="isAvailable ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'">
+                 :class="isAvailable ? 'bg-green-50 border border-green-200 text-green-700' : (isMaintenance ? 'bg-orange-50 border border-orange-200 text-orange-700' : 'bg-red-50 border border-red-200 text-red-700')">
                 <template x-if="isAvailable">
                     <span>✓ Thời gian này còn trống, có thể đặt.</span>
                 </template>
-                <template x-if="!isAvailable">
+                <template x-if="!isAvailable && isMaintenance">
+                    <span>⚠ Phòng/thiết bị này đang bảo trì, không thể đặt lịch.</span>
+                </template>
+                <template x-if="!isAvailable && !isMaintenance">
                     <span>✗ Thời gian này đã có booking trùng. Vui lòng chọn thời gian khác.</span>
                 </template>
             </div>
@@ -145,6 +148,7 @@ function bookingForm() {
         selectedDate: '',
         availabilityChecked: false,
         isAvailable: false,
+        isMaintenance: false,
 
         slots: [
             { label: 'Ca 1', sub: 'Tiết 1–3',   start: '06:45', end: '09:00' },
@@ -168,6 +172,7 @@ function bookingForm() {
         resetBookable() {
             this.bookableId = '';
             this.availabilityChecked = false;
+            this.isMaintenance = false;
         },
 
         selectSlot(slot) {
@@ -242,6 +247,7 @@ function bookingForm() {
                 });
                 const data = await res.json();
                 this.isAvailable = data.available;
+                this.isMaintenance = data.maintenance ?? false;
                 this.availabilityChecked = true;
             } catch (e) {
                 this.availabilityChecked = false;

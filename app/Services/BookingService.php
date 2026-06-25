@@ -30,6 +30,11 @@ class BookingService
             $start = Carbon::parse($data['start_time']);
             $end   = Carbon::parse($data['end_time']);
 
+            // Reject immediately if item is under maintenance or unavailable
+            if (!$this->availabilityService->isStatusBookable($data['bookable_type'], $data['bookable_id'])) {
+                throw new BookingConflictException(collect(), 'Phòng/thiết bị này đang bảo trì hoặc không khả dụng.');
+            }
+
             // Pessimistic lock: block concurrent creates for the same bookable/time window
             Booking::where('bookable_type', $data['bookable_type'])
                 ->where('bookable_id', $data['bookable_id'])
