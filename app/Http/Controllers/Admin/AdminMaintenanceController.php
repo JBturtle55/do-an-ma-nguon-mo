@@ -7,7 +7,6 @@ use App\Models\Equipment;
 use App\Models\MaintenanceLog;
 use App\Models\Room;
 use App\Models\User;
-use App\Models\Booking;
 use App\Notifications\BookingAffectedByMaintenanceNotification;
 use App\Notifications\MaintenanceReportedNotification;
 use App\Notifications\MaintenanceStatusChangedNotification;
@@ -61,20 +60,7 @@ class AdminMaintenanceController extends Controller
         $log->loggable->update(['status' => 'maintenance']);
 
         Notification::send(User::role('admin')->get(), new MaintenanceReportedNotification($log));
-
-        // Notify users with upcoming bookings for the affected item
-        $affectedUsers = Booking::where('bookable_type', $log->loggable_type)
-            ->where('bookable_id', $log->loggable_id)
-            ->where('start_time', '>=', now())
-            ->whereIn('status', ['approved', 'pending'])
-            ->with('user')
-            ->get()
-            ->pluck('user')
-            ->unique('id');
-
-        if ($affectedUsers->isNotEmpty()) {
-            Notification::send($affectedUsers, new BookingAffectedByMaintenanceNotification($log));
-        }
+        Notification::send(User::whereDoesntHave('roles', fn ($q) => $q->where('name', 'admin'))->get(), new BookingAffectedByMaintenanceNotification($log));
 
         return redirect()->route('admin.maintenance.index')->with('success', 'Đã báo cáo sự cố thành công.');
     }
