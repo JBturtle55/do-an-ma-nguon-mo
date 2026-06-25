@@ -11,8 +11,11 @@
             this.timetableReady = true;
             this.$nextTick(() => window.initTimetable('my-calendar', '/api/calendar/my-events'));
         }
-    }
-}">
+    },
+    cancelOpen: false,
+    cancelUrl: '',
+    openCancel(url) { this.cancelUrl = url; this.cancelOpen = true; }
+}" @keydown.escape.window="cancelOpen = false">
 
     {{-- Header --}}
     <div class="flex flex-wrap items-center justify-between gap-3">
@@ -89,11 +92,8 @@
                             <td class="table-td">
                                 <a href="{{ route('bookings.show', $booking) }}" class="text-blue-600 text-xs hover:underline">Chi tiết</a>
                                 @if(in_array($booking->status, ['pending', 'approved']))
-                                    <form method="POST" action="{{ route('bookings.cancel', $booking) }}" class="inline ml-2"
-                                          onsubmit="return confirm('Huỷ booking này?')">
-                                        @csrf @method('PATCH')
-                                        <button class="text-red-500 text-xs hover:underline">Huỷ</button>
-                                    </form>
+                                    <button type="button" class="text-red-500 text-xs hover:underline ml-2"
+                                            @click="openCancel('{{ route('bookings.cancel', $booking) }}')">Huỷ</button>
                                 @endif
                             </td>
                         </tr>
@@ -130,5 +130,48 @@
         </div>
     </div>
 
+    {{-- Confirm cancel modal --}}
+    <div x-show="cancelOpen" @click="cancelOpen = false"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black/40 z-50" style="display:none"></div>
+    <div x-show="cancelOpen"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+         x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none" style="display:none">
+        <div class="bg-white rounded-xl shadow-xl pointer-events-auto" style="width:360px;max-width:calc(100vw - 2rem)" @click.stop>
+            <div class="flex items-center gap-2.5 px-4 pt-4 pb-3">
+                <div class="w-7 h-7 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="font-semibold text-gray-900 text-sm">Huỷ booking</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Hành động này không thể hoàn tác.</p>
+                </div>
+                <button @click="cancelOpen = false" class="text-gray-300 hover:text-gray-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <p class="text-xs text-gray-500 px-4 pb-4">Bạn có chắc muốn huỷ booking này không?</p>
+            <div class="flex gap-2 justify-end px-4 pb-4">
+                <button type="button" @click="cancelOpen = false" class="btn-secondary">Không</button>
+                <form :action="cancelUrl" method="POST" @submit="cancelOpen = false">
+                    @csrf
+                    <input type="hidden" name="_method" value="PATCH">
+                    <button type="submit" class="btn-danger">Huỷ booking</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

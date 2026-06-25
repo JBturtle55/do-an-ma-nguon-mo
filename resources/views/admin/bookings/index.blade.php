@@ -2,8 +2,8 @@
 @section('title', 'Quản lý Booking')
 
 @section('content')
-<div class="space-y-4" x-data="{ rejectOpen: false, rejectId: null, rejectNotes: '' }"
-     @keydown.escape.window="rejectOpen = false">
+<div class="space-y-4" x-data="{ rejectOpen: false, rejectId: null, rejectNotes: '', approveOpen: false, approveUrl: '' }"
+     @keydown.escape.window="rejectOpen = false; approveOpen = false">
     <h1 class="text-xl font-bold text-gray-800">Quản lý Booking</h1>
 
     {{-- Filters --}}
@@ -54,11 +54,8 @@
                     <td class="table-td">
                         @if($booking->status === 'pending')
                             <div class="flex gap-2">
-                                <form method="POST" action="{{ route('admin.bookings.approve', $booking) }}"
-                                      onsubmit="return confirm('Duyệt booking này?')">
-                                    @csrf @method('PATCH')
-                                    <button class="text-green-600 text-xs hover:underline font-medium">Duyệt</button>
-                                </form>
+                                <button type="button" class="text-green-600 text-xs hover:underline font-medium"
+                                        @click="approveOpen = true; approveUrl = '{{ route('admin.bookings.approve', $booking) }}'">Duyệt</button>
                                 <button @click="rejectOpen = true; rejectId = {{ $booking->id }}"
                                         class="text-red-500 text-xs hover:underline font-medium">Từ chối</button>
                             </div>
@@ -75,6 +72,49 @@
         @if($bookings->hasPages())
             <div class="px-4 py-3 border-t">{{ $bookings->links() }}</div>
         @endif
+    </div>
+
+    {{-- Approve modal --}}
+    <div x-show="approveOpen" @click="approveOpen = false"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black/40 z-50" style="display:none"></div>
+    <div x-show="approveOpen"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+         x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none" style="display:none">
+        <div class="bg-white rounded-xl shadow-xl pointer-events-auto" style="width:360px;max-width:calc(100vw - 2rem)" @click.stop>
+            <div class="flex items-center gap-2.5 px-4 pt-4 pb-3">
+                <div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="font-semibold text-gray-900 text-sm">Duyệt booking</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Xác nhận duyệt yêu cầu đặt lịch này?</p>
+                </div>
+                <button @click="approveOpen = false" class="text-gray-300 hover:text-gray-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="flex gap-2 justify-end px-4 pb-4">
+                <button type="button" @click="approveOpen = false" class="btn-secondary">Huỷ</button>
+                <form :action="approveUrl" method="POST" @submit="approveOpen = false">
+                    @csrf
+                    <input type="hidden" name="_method" value="PATCH">
+                    <button type="submit" class="btn-success">Duyệt</button>
+                </form>
+            </div>
+        </div>
     </div>
 
     {{-- Reject modal --}}
