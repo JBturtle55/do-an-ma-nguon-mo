@@ -45,6 +45,13 @@ class AdminEquipmentController extends Controller
         return redirect()->route('admin.equipment.index')->with('success', 'Đã tạo thiết bị thành công.');
     }
 
+    public function show(Equipment $equipment): View
+    {
+        $equipment->load(['category', 'room', 'bookings' => fn ($q) => $q->latest()->limit(10)->with('user')]);
+
+        return view('admin.equipment.show', compact('equipment'));
+    }
+
     public function edit(Equipment $equipment): View
     {
         $categories = EquipmentCategory::orderBy('name')->get();

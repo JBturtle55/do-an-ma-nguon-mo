@@ -93,8 +93,8 @@ test('exportCsv returns valid csv string for summary report', function () {
 
     $csv = $this->service->exportCsv('summary', $this->from, $this->to);
 
-    expect($csv)->toContain('total')
-        ->and($csv)->toContain('approved');
+    expect($csv)->toContain('Tổng')
+        ->and($csv)->toContain('Đã duyệt');
 });
 
 test('exportCsv returns empty string for unknown report type', function () {

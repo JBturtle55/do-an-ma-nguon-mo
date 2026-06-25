@@ -27,6 +27,13 @@ class AdminMaintenanceController extends Controller
         return view('admin.maintenance.index', compact('logs'));
     }
 
+    public function show(MaintenanceLog $log): View
+    {
+        $log->load(['loggable', 'reporter']);
+
+        return view('admin.maintenance.show', compact('log'));
+    }
+
     public function create(): View
     {
         $rooms     = Room::orderBy('name')->get();
@@ -48,7 +55,7 @@ class AdminMaintenanceController extends Controller
             'status'      => 'open',
         ]));
 
-        Notification::send(User::all(), new MaintenanceReportedNotification($log));
+        Notification::send(User::role('admin')->get(), new MaintenanceReportedNotification($log));
 
         return redirect()->route('admin.maintenance.index')->with('success', 'Đã báo cáo sự cố thành công.');
     }
@@ -75,6 +82,6 @@ class AdminMaintenanceController extends Controller
 
     private function notifyStatusChange(MaintenanceLog $log): void
     {
-        Notification::send(User::all(), new MaintenanceStatusChangedNotification($log));
+        Notification::send(User::role('admin')->get(), new MaintenanceStatusChangedNotification($log));
     }
 }

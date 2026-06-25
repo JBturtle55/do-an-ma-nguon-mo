@@ -11,13 +11,13 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $admin = User::firstOrCreate(
-            ['email' => 'admin@lab.test'],
+            ['email' => 'admin@gmail.com'],
             ['name' => 'Admin Lab', 'password' => Hash::make('password')]
         );
         $admin->syncRoles(['admin']);
 
         $lecturer = User::firstOrCreate(
-            ['email' => 'lecturer@lab.test'],
+            ['email' => 'user@gmail.com'],
             ['name' => 'Giảng Viên Demo', 'password' => Hash::make('password')]
         );
         $lecturer->syncRoles(['lecturer']);

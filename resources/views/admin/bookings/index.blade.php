@@ -18,6 +18,9 @@
             <input type="date" name="date_from" value="{{ request('date_from') }}" class="form-input w-40">
             <input type="date" name="date_to" value="{{ request('date_to') }}" class="form-input w-40">
             <button type="submit" class="btn-secondary">Lọc</button>
+            @if(request()->hasAny(['search','status','date_from','date_to']))
+                <a href="{{ route('admin.bookings.index') }}" class="btn-secondary">Xoá bộ lọc</a>
+            @endif
         </form>
     </div>
 
@@ -50,7 +53,8 @@
                     <td class="table-td">
                         @if($booking->status === 'pending')
                             <div class="flex gap-2">
-                                <form method="POST" action="{{ route('admin.bookings.approve', $booking) }}">
+                                <form method="POST" action="{{ route('admin.bookings.approve', $booking) }}"
+                                      onsubmit="return confirm('Duyệt booking này?')">
                                     @csrf @method('PATCH')
                                     <button class="text-green-600 text-xs hover:underline font-medium">Duyệt</button>
                                 </form>
@@ -73,7 +77,7 @@
     </div>
 
     {{-- Reject modal --}}
-    <div x-show="rejectOpen" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" style="display:none">
+    <div x-show="rejectOpen" @click="rejectOpen = false" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center" style="display:none">
         <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4" @click.stop>
             <h3 class="font-semibold text-gray-800 mb-3">Từ chối Booking</h3>
             <form :action="`{{ url('/admin/bookings') }}/${rejectId}/reject`" method="POST">

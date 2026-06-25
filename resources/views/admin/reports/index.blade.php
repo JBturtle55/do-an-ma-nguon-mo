@@ -7,7 +7,13 @@
 
     {{-- Date range form --}}
     <div class="card">
-        <form method="GET" class="flex flex-wrap items-end gap-3">
+        <form method="GET" class="flex flex-wrap items-end gap-3" x-data="{}"
+              @submit.prevent="
+                const f = $el.querySelector('[name=from]').value;
+                const t = $el.querySelector('[name=to]').value;
+                if (f && t && f > t) { alert('Ngày bắt đầu không được sau ngày kết thúc.'); return; }
+                $el.submit();
+              ">
             <div>
                 <label class="form-label">Từ ngày</label>
                 <input type="date" name="from" value="{{ $from->toDateString() }}" class="form-input">
@@ -17,10 +23,14 @@
                 <input type="date" name="to" value="{{ $to->toDateString() }}" class="form-input">
             </div>
             <button type="submit" class="btn-primary">Tạo báo cáo</button>
-            <a href="{{ route('admin.reports.export', ['from' => $from->toDateString(), 'to' => $to->toDateString(), 'type' => 'utilization']) }}"
-               class="btn-secondary">
-                Xuất CSV
-            </a>
+            <div class="flex gap-2">
+                <a href="{{ route('admin.reports.export', ['from' => $from->toDateString(), 'to' => $to->toDateString(), 'type' => 'utilization']) }}"
+                   class="btn-secondary text-sm">Xuất sử dụng phòng</a>
+                <a href="{{ route('admin.reports.export', ['from' => $from->toDateString(), 'to' => $to->toDateString(), 'type' => 'summary']) }}"
+                   class="btn-secondary text-sm">Xuất tổng kết</a>
+                <a href="{{ route('admin.reports.export', ['from' => $from->toDateString(), 'to' => $to->toDateString(), 'type' => 'top_users']) }}"
+                   class="btn-secondary text-sm">Xuất top users</a>
+            </div>
         </form>
     </div>
 

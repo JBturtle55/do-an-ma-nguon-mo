@@ -23,6 +23,9 @@
                 <option value="maintenance" @selected(request('status') === 'maintenance')>Bảo trì</option>
             </select>
             <button type="submit" class="btn-secondary">Lọc</button>
+            @if(request()->hasAny(['search','type','status']))
+                <a href="{{ route('rooms.index') }}" class="btn-secondary">Xoá bộ lọc</a>
+            @endif
         </form>
     </div>
 

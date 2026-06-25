@@ -40,6 +40,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/my-events', [CalendarController::class, 'myEvents'])->name('my-events');
     });
 
+    // Availability check (same-origin fetch from booking form — needs session auth)
+    Route::get('/api/availability/check', [\App\Http\Controllers\Api\AvailabilityController::class, 'check'])->name('api.availability.check');
+
     // Rooms (read-only)
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::get('/rooms/{room}', [RoomController::class, 'show'])->name('rooms.show');
@@ -83,6 +86,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/maintenance', [AdminMaintenanceController::class, 'index'])->name('maintenance.index');
     Route::get('/maintenance/create', [AdminMaintenanceController::class, 'create'])->name('maintenance.create');
     Route::post('/maintenance', [AdminMaintenanceController::class, 'store'])->name('maintenance.store');
+    Route::get('/maintenance/{log}', [AdminMaintenanceController::class, 'show'])->name('maintenance.show');
     Route::patch('/maintenance/{log}/progress', [AdminMaintenanceController::class, 'progress'])->name('maintenance.progress');
     Route::patch('/maintenance/{log}/resolve', [AdminMaintenanceController::class, 'resolve'])->name('maintenance.resolve');
 

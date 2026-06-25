@@ -27,6 +27,7 @@
                     <td class="table-td">{{ $room->capacity }}</td>
                     <td class="table-td"><x-badge :status="$room->status"/></td>
                     <td class="table-td">
+                        <a href="{{ route('admin.rooms.show', $room) }}" class="text-gray-600 text-xs hover:underline mr-2">Xem</a>
                         <a href="{{ route('admin.rooms.edit', $room) }}" class="text-blue-600 text-xs hover:underline mr-2">Sửa</a>
                         <form method="POST" action="{{ route('admin.rooms.destroy', $room) }}" class="inline" onsubmit="return confirm('Xoá phòng này?')">
                             @csrf @method('DELETE')

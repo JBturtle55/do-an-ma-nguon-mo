@@ -4,7 +4,7 @@
 <div class="max-w-lg mx-auto space-y-4">
     <h1 class="text-xl font-bold text-gray-800">Thêm phòng mới</h1>
     <div class="card">
-        <form method="POST" action="{{ route('admin.rooms.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('admin.rooms.store') }}" class="space-y-4" enctype="multipart/form-data">
             @csrf
             <div>
                 <label class="form-label">Tên phòng *</label>
@@ -40,6 +40,11 @@
             <div>
                 <label class="form-label">Mô tả</label>
                 <textarea name="description" rows="3" class="form-input">{{ old('description') }}</textarea>
+            </div>
+            <div>
+                <label class="form-label">Ảnh phòng</label>
+                <input type="file" name="image" accept="image/*" class="form-input">
+                @error('image')<p class="form-error">{{ $message }}</p>@enderror
             </div>
             <div class="flex gap-3">
                 <button type="submit" class="btn-primary">Lưu phòng</button>

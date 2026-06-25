@@ -22,6 +22,9 @@
                 <option value="maintenance" @selected(request('status') === 'maintenance')>Bảo trì</option>
             </select>
             <button type="submit" class="btn-secondary">Lọc</button>
+            @if(request()->hasAny(['search','category','status']))
+                <a href="{{ route('equipment.index') }}" class="btn-secondary">Xoá bộ lọc</a>
+            @endif
         </form>
     </div>
 
@@ -33,7 +36,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/>
                     </svg>
                 </div>
-                <h3 class="font-semibold text-gray-800 text-sm mb-1">{{ $equip->name }}</h3>
+                <a href="{{ route('equipment.show', $equip) }}" class="font-semibold text-gray-800 text-sm mb-1 hover:text-blue-600 hover:underline block">{{ $equip->name }}</a>
                 <div class="space-y-1 text-xs text-gray-500 mb-3">
                     <div>{{ $equip->category->name }}</div>
                     <div>Số lượng: {{ $equip->quantity }}</div>

@@ -19,10 +19,14 @@ class ReportService
     {
         $totalHours = $from->diffInDays($to) * 14; // 07:00–21:00 = 14h/day
 
+        $diffExpr = DB::connection()->getDriverName() === 'sqlite'
+            ? DB::raw('SUM((julianday(end_time) - julianday(start_time)) * 24) as total_hours')
+            : DB::raw('SUM(TIMESTAMPDIFF(MINUTE, start_time, end_time)) / 60 as total_hours');
+
         $bookings = Booking::where('bookable_type', Room::class)
             ->where('status', 'approved')
             ->whereBetween('start_time', [$from, $to])
-            ->select('bookable_id', DB::raw('SUM(TIMESTAMPDIFF(MINUTE, start_time, end_time)) / 60 as total_hours'))
+            ->select('bookable_id', $diffExpr)
             ->groupBy('bookable_id')
             ->get()
             ->keyBy('bookable_id');

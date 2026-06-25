@@ -27,6 +27,7 @@
                     <td class="table-td">{{ $equip->quantity }}</td>
                     <td class="table-td"><x-badge :status="$equip->status"/></td>
                     <td class="table-td">
+                        <a href="{{ route('admin.equipment.show', $equip) }}" class="text-gray-600 text-xs hover:underline mr-2">Xem</a>
                         <a href="{{ route('admin.equipment.edit', $equip) }}" class="text-blue-600 text-xs hover:underline mr-2">Sửa</a>
                         <form method="POST" action="{{ route('admin.equipment.destroy', $equip) }}" class="inline" onsubmit="return confirm('Xoá thiết bị?')">
                             @csrf @method('DELETE')

@@ -249,7 +249,14 @@ function bookingForm() {
         },
 
         submitForm(e) {
-            if (this.availabilityChecked && !this.isAvailable) {
+            if (!this.bookableId || !this.startTime || !this.endTime) return;
+            if (!this.availabilityChecked) {
+                e.preventDefault();
+                alert('Vui lòng đợi kiểm tra lịch trống trước khi gửi.');
+                this.checkAvailability();
+                return;
+            }
+            if (!this.isAvailable) {
                 e.preventDefault();
                 alert('Vui lòng chọn thời gian không bị trùng.');
             }

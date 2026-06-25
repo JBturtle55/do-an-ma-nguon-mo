@@ -84,7 +84,7 @@
                             </td>
                             <td class="table-td text-gray-500">{{ $booking->bookable?->name ?? '—' }}</td>
                             <td class="table-td">{{ $booking->start_time->format('d/m/Y H:i') }}</td>
-                            <td class="table-td">{{ $booking->end_time->format('H:i') }}</td>
+                            <td class="table-td">{{ $booking->end_time->format('d/m/Y H:i') }}</td>
                             <td class="table-td"><x-badge :status="$booking->status"/></td>
                             <td class="table-td">
                                 <a href="{{ route('bookings.show', $booking) }}" class="text-blue-600 text-xs hover:underline">Chi tiết</a>

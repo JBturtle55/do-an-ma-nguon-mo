@@ -33,19 +33,23 @@
                 @forelse($logs as $log)
                 <tr class="hover:bg-gray-50">
                     <td class="table-td font-medium">{{ $log->loggable?->name ?? '—' }}</td>
-                    <td class="table-td text-gray-600 max-w-xs truncate">{{ $log->description }}</td>
+                    <td class="table-td text-gray-600 max-w-xs">
+                        <a href="{{ route('admin.maintenance.show', $log) }}" class="hover:underline text-gray-700 line-clamp-1">{{ $log->description }}</a>
+                    </td>
                     <td class="table-td text-gray-500">{{ $log->reporter->name }}</td>
                     <td class="table-td"><x-badge :status="$log->status"/></td>
                     <td class="table-td text-gray-500">{{ $log->created_at->format('d/m/Y') }}</td>
                     <td class="table-td space-x-2">
                         @if($log->status === 'open')
-                        <form method="POST" action="{{ route('admin.maintenance.progress', $log) }}" class="inline">
+                        <form method="POST" action="{{ route('admin.maintenance.progress', $log) }}" class="inline"
+                              onsubmit="return confirm('Chuyển sang đang xử lý?')">
                             @csrf @method('PATCH')
                             <button class="text-blue-600 text-xs hover:underline">Đang xử lý</button>
                         </form>
                         @endif
                         @if($log->status !== 'resolved')
-                        <form method="POST" action="{{ route('admin.maintenance.resolve', $log) }}" class="inline">
+                        <form method="POST" action="{{ route('admin.maintenance.resolve', $log) }}" class="inline"
+                              onsubmit="return confirm('Đánh dấu đã giải quyết xong?')">
                             @csrf @method('PATCH')
                             <button class="text-green-600 text-xs hover:underline">Đánh dấu xong</button>
                         </form>

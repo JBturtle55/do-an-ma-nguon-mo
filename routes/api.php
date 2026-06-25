@@ -3,4 +3,4 @@
 use App\Http\Controllers\Api\AvailabilityController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/availability/check', [AvailabilityController::class, 'check'])->name('api.availability.check');
+// Route moved to web.php (auth middleware + session support)
