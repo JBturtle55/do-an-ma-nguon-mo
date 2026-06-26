@@ -1,47 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Admin Dashboard')
 
-@php
-    $pendingBookingsJson = $pendingBookings->map(fn($b) => [
-        'title'    => $b->title,
-        'user'     => $b->user->name,
-        'bookable' => $b->bookable?->name ?? '—',
-        'time'     => $b->start_time->format('d/m H:i'),
-        'url'      => route('admin.bookings.show', $b),
-    ]);
-@endphp
 @section('content')
-<div class="space-y-6" x-data="{
-    stats: @json($stats),
-    bookings: @json($pendingBookingsJson),
-    lastUpdated: '',
-    async refresh() {
-        try {
-            const [sRes, pRes] = await Promise.all([
-                fetch('{{ route('admin.dashboard.stats') }}', { headers: {'X-Requested-With': 'XMLHttpRequest'} }),
-                fetch('{{ route('admin.dashboard.pending') }}', { headers: {'X-Requested-With': 'XMLHttpRequest'} }),
-            ]);
-            if (sRes.ok) this.stats    = await sRes.json();
-            if (pRes.ok) this.bookings = await pRes.json();
-            this.lastUpdated = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-        } catch {}
-    },
-    init() {
-        this.lastUpdated = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
-        setInterval(() => this.refresh(), 30000);
-    }
-}">
-    {{-- Header --}}
-    <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-        <span class="flex items-center gap-1.5 text-xs text-green-600">
-            <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-            </span>
-            Live · <span x-text="lastUpdated"></span>
-        </span>
-    </div>
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
 
     {{-- Stats --}}
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -52,7 +14,7 @@
                 </svg>
             </div>
             <div class="text-center">
-                <div class="text-2xl font-bold text-blue-600" x-text="stats.total_rooms">{{ $stats['total_rooms'] }}</div>
+                <div class="text-2xl font-bold text-blue-600">{{ $stats['total_rooms'] }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Tổng phòng</div>
             </div>
         </div>
@@ -63,7 +25,7 @@
                 </svg>
             </div>
             <div class="text-center">
-                <div class="text-2xl font-bold text-green-600" x-text="stats.available_rooms">{{ $stats['available_rooms'] }}</div>
+                <div class="text-2xl font-bold text-green-600">{{ $stats['available_rooms'] }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Phòng trống</div>
             </div>
         </div>
@@ -74,7 +36,7 @@
                 </svg>
             </div>
             <div class="text-center">
-                <div class="text-2xl font-bold text-purple-600" x-text="stats.total_equipment">{{ $stats['total_equipment'] }}</div>
+                <div class="text-2xl font-bold text-purple-600">{{ $stats['total_equipment'] }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Thiết bị</div>
             </div>
         </div>
@@ -85,7 +47,7 @@
                 </svg>
             </div>
             <div class="text-center">
-                <div class="text-2xl font-bold text-indigo-600" x-text="stats.total_users">{{ $stats['total_users'] }}</div>
+                <div class="text-2xl font-bold text-indigo-600">{{ $stats['total_users'] }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Người dùng</div>
             </div>
         </div>
@@ -96,7 +58,7 @@
                 </svg>
             </div>
             <div class="text-center">
-                <div class="text-2xl font-bold text-yellow-600" x-text="stats.pending_bookings">{{ $stats['pending_bookings'] }}</div>
+                <div class="text-2xl font-bold text-yellow-600">{{ $stats['pending_bookings'] }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Booking chờ</div>
             </div>
         </div>
@@ -107,7 +69,7 @@
                 </svg>
             </div>
             <div class="text-center">
-                <div class="text-2xl font-bold text-teal-600" x-text="stats.today_bookings">{{ $stats['today_bookings'] }}</div>
+                <div class="text-2xl font-bold text-teal-600">{{ $stats['today_bookings'] }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Duyệt hôm nay</div>
             </div>
         </div>
@@ -116,18 +78,14 @@
     {{-- Pending bookings --}}
     <div class="card">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="font-semibold text-gray-700">
-                Booking chờ duyệt
-                <span class="ml-1.5 text-xs font-normal text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full" x-text="bookings.length + ' booking'" x-show="bookings.length > 0"></span>
-            </h2>
+            <h2 class="font-semibold text-gray-700">Booking chờ duyệt</h2>
             <a href="{{ route('admin.bookings.index', ['status' => 'pending']) }}" class="text-sm text-blue-600 hover:underline">
                 Xem tất cả →
             </a>
         </div>
-        <template x-if="bookings.length === 0">
+        @if($pendingBookings->isEmpty())
             <p class="text-gray-400 text-sm text-center py-4">Không có booking nào đang chờ duyệt.</p>
-        </template>
-        <template x-if="bookings.length > 0">
+        @else
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
@@ -140,21 +98,21 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
-                        <template x-for="b in bookings" :key="b.url">
-                            <tr class="hover:bg-gray-50">
-                                <td class="table-td font-medium" x-text="b.title"></td>
-                                <td class="table-td text-gray-500" x-text="b.user"></td>
-                                <td class="table-td text-gray-500" x-text="b.bookable"></td>
-                                <td class="table-td text-gray-500" x-text="b.time"></td>
-                                <td class="table-td">
-                                    <a :href="b.url" class="text-blue-600 text-xs hover:underline">Xem & Duyệt</a>
-                                </td>
-                            </tr>
-                        </template>
+                        @foreach($pendingBookings as $booking)
+                        <tr class="hover:bg-gray-50">
+                            <td class="table-td font-medium">{{ $booking->title }}</td>
+                            <td class="table-td text-gray-500">{{ $booking->user->name }}</td>
+                            <td class="table-td text-gray-500">{{ $booking->bookable?->name ?? '—' }}</td>
+                            <td class="table-td text-gray-500">{{ $booking->start_time->format('d/m H:i') }}</td>
+                            <td class="table-td">
+                                <a href="{{ route('admin.bookings.show', $booking) }}" class="text-blue-600 text-xs hover:underline">Xem & Duyệt</a>
+                            </td>
+                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
-        </template>
+        @endif
     </div>
 
     {{-- Quick links --}}
