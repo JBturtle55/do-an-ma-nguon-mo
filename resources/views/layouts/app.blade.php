@@ -118,29 +118,22 @@
             count: @json(auth()->user()->unreadNotifications()->count()),
             items: [],
             open: false,
-            _es: null,
 
             init() {
-                this.connectSSE();
+                this.poll();
+                setInterval(() => this.poll(), 30000);
             },
 
-            connectSSE() {
-                const connect = () => {
-                    const es = new EventSource('{{ route('notifications.stream') }}');
-                    this._es = es;
-                    es.onmessage = (e) => {
-                        try {
-                            const data = JSON.parse(e.data);
-                            this.count = data.count;
-                            if (this.open) this.items = data.items;
-                        } catch {}
-                    };
-                    es.onerror = () => {
-                        es.close();
-                        setTimeout(connect, 5000); // auto-reconnect
-                    };
-                };
-                connect();
+            async poll() {
+                try {
+                    const res = await fetch('{{ route('notifications.unread-count') }}', {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    this.count = data.count;
+                    if (this.open) this.items = data.items;
+                } catch {}
             },
 
             async fetchNotifications() {
