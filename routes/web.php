@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AdminScheduleController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Api\CalendarController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\NotificationController;
@@ -35,6 +36,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard stats (JSON — for realtime refresh)
     Route::get('/dashboard/stats', [DashboardController::class, 'stats'])->name('dashboard.stats');
+
+    // AI Chat
+    Route::post('/chat', [ChatController::class, 'send'])->name('chat.send');
 
     // Calendar JSON endpoints (same-origin fetch — need session auth so placed in web routes)
     Route::prefix('api/calendar')->name('api.calendar.')->group(function () {

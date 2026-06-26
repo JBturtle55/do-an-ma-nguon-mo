@@ -112,6 +112,151 @@
         </div>
     </div>
     @stack('scripts')
+
+    {{-- AI Chat Widget --}}
+    <div x-data="aiChat()" class="fixed bottom-6 right-6 z-40">
+        {{-- Chat panel --}}
+        <div x-show="open"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+             class="absolute bottom-16 right-0 bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden"
+             style="width:320px;height:430px;display:none">
+            {{-- Header --}}
+            <div class="px-4 py-3 bg-blue-600 flex items-center gap-2 flex-shrink-0">
+                <div class="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2h-2"/>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-white text-sm font-semibold leading-tight">Trợ lý AI</p>
+                    <p class="text-blue-200 text-xs">Hỏi về phòng, booking, thiết bị...</p>
+                </div>
+                <button @click="open = false" class="text-blue-200 hover:text-white transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            {{-- Messages --}}
+            <div class="flex-1 overflow-y-auto p-3 space-y-2 bg-gray-50" x-ref="msgArea">
+                <template x-if="messages.length === 0">
+                    <div class="text-center pt-6">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z"/>
+                            </svg>
+                        </div>
+                        <p class="text-xs text-gray-400">Xin chào! Tôi có thể giúp bạn tra cứu phòng trống, tình trạng booking, hoặc thông tin thiết bị.</p>
+                    </div>
+                </template>
+                <template x-for="msg in messages" :key="msg.id">
+                    <div :class="msg.role === 'user' ? 'flex justify-end' : 'flex justify-start'">
+                        <div :class="msg.role === 'user'
+                                ? 'bg-blue-600 text-white rounded-tl-xl rounded-tr-sm rounded-bl-xl'
+                                : 'bg-white text-gray-800 rounded-tr-xl rounded-tl-sm rounded-br-xl border border-gray-100 shadow-sm'"
+                             class="px-3 py-2 text-sm max-w-[85%] leading-relaxed"
+                             x-text="msg.content"></div>
+                    </div>
+                </template>
+                <template x-if="loading">
+                    <div class="flex justify-start">
+                        <div class="bg-white border border-gray-100 rounded-xl px-3 py-2 shadow-sm">
+                            <span class="text-gray-400 text-xs">Đang trả lời</span>
+                            <span class="inline-flex gap-0.5 ml-1">
+                                <span class="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style="animation-delay:0ms"></span>
+                                <span class="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style="animation-delay:150ms"></span>
+                                <span class="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style="animation-delay:300ms"></span>
+                            </span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            {{-- Input --}}
+            <div class="p-3 bg-white border-t border-gray-100 flex-shrink-0">
+                <form @submit.prevent="send()" class="flex gap-2">
+                    <input x-model="input"
+                           :disabled="loading"
+                           @keydown.enter.prevent="send()"
+                           type="text"
+                           placeholder="Nhập câu hỏi..."
+                           class="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-400 disabled:bg-gray-50">
+                    <button type="submit"
+                            :disabled="loading || !input.trim()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 transition-colors disabled:opacity-40">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        {{-- Toggle button --}}
+        <button @click="open = !open"
+                class="w-13 h-13 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-105"
+                style="width:52px;height:52px">
+            <svg x-show="!open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-3 3v-3z"/>
+            </svg>
+            <svg x-show="open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+    function aiChat() {
+        return {
+            open: false,
+            input: '',
+            messages: [],
+            loading: false,
+
+            async send() {
+                const text = this.input.trim();
+                if (!text || this.loading) return;
+                this.input = '';
+                this.messages.push({ id: Date.now(), role: 'user', content: text });
+                this.loading = true;
+                this.$nextTick(() => this.scrollToBottom());
+
+                try {
+                    const res = await fetch('{{ route('chat.send') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({
+                            message: text,
+                            history: this.messages.slice(-8),
+                        }),
+                    });
+                    const data = await res.json();
+                    this.messages.push({ id: Date.now() + 1, role: 'assistant', content: data.reply || 'Không có phản hồi.' });
+                } catch {
+                    this.messages.push({ id: Date.now() + 1, role: 'assistant', content: 'Lỗi kết nối. Thử lại sau.' });
+                }
+
+                this.loading = false;
+                this.$nextTick(() => this.scrollToBottom());
+            },
+
+            scrollToBottom() {
+                const el = this.$refs.msgArea;
+                if (el) el.scrollTop = el.scrollHeight;
+            },
+        };
+    }
+    </script>
+
     <script>
     function notificationBell() {
         return {
