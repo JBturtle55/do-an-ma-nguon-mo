@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Room;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -26,5 +27,16 @@ class DashboardController extends Controller
             'availableRooms',
             'unreadNotifs'
         ));
+    }
+
+    public function stats(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        return response()->json([
+            'pending'  => Booking::forUser($user->id)->pending()->count(),
+            'approved' => Booking::forUser($user->id)->approved()->count(),
+            'rooms'    => Room::available()->count(),
+            'notifs'   => $user->unreadNotifications()->count(),
+        ]);
     }
 }

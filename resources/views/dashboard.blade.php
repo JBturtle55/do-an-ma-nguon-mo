@@ -2,11 +2,43 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="{
+    stats: {
+        pending:  {{ $pendingCount }},
+        approved: {{ $approvedCount }},
+        rooms:    {{ $availableRooms }},
+        notifs:   {{ $unreadNotifs }},
+    },
+    lastUpdated: '',
+    async refresh() {
+        try {
+            const res = await fetch('{{ route('dashboard.stats') }}', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (res.ok) {
+                this.stats = await res.json();
+                this.lastUpdated = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+            }
+        } catch {}
+    },
+    init() {
+        this.lastUpdated = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        setInterval(() => this.refresh(), 30000);
+    }
+}">
     {{-- Greeting --}}
-    <div>
-        <h1 class="text-2xl font-bold text-gray-800">Xin chào, {{ auth()->user()->name }} 👋</h1>
-        <p class="text-gray-500 text-sm mt-1">{{ now()->format('l, d/m/Y') }}</p>
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Xin chào, {{ auth()->user()->name }} 👋</h1>
+            <p class="text-gray-500 text-sm mt-1">{{ now()->format('l, d/m/Y') }}</p>
+        </div>
+        <span class="flex items-center gap-1.5 text-xs text-green-600">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            Live · <span x-text="lastUpdated"></span>
+        </span>
     </div>
 
     {{-- Stats cards --}}
@@ -18,7 +50,7 @@
                 </svg>
             </div>
             <div>
-                <div class="text-2xl font-bold text-yellow-600">{{ $pendingCount }}</div>
+                <div class="text-2xl font-bold text-yellow-600" x-text="stats.pending">{{ $pendingCount }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Booking chờ duyệt</div>
             </div>
         </div>
@@ -29,7 +61,7 @@
                 </svg>
             </div>
             <div>
-                <div class="text-2xl font-bold text-green-600">{{ $approvedCount }}</div>
+                <div class="text-2xl font-bold text-green-600" x-text="stats.approved">{{ $approvedCount }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Booking đã duyệt</div>
             </div>
         </div>
@@ -40,7 +72,7 @@
                 </svg>
             </div>
             <div>
-                <div class="text-2xl font-bold text-blue-600">{{ $availableRooms }}</div>
+                <div class="text-2xl font-bold text-blue-600" x-text="stats.rooms">{{ $availableRooms }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Phòng sẵn sàng</div>
             </div>
         </div>
@@ -51,7 +83,7 @@
                 </svg>
             </div>
             <div>
-                <div class="text-2xl font-bold text-purple-600">{{ $unreadNotifs }}</div>
+                <div class="text-2xl font-bold text-purple-600" x-text="stats.notifs">{{ $unreadNotifs }}</div>
                 <div class="text-xs text-gray-500 mt-0.5">Thông báo chưa đọc</div>
             </div>
         </div>
