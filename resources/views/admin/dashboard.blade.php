@@ -1,16 +1,19 @@
 @extends('layouts.app')
 @section('title', 'Admin Dashboard')
 
-@section('content')
-<div class="space-y-6" x-data="{
-    stats: @json($stats),
-    bookings: @json($pendingBookings->map(fn($b) => [
+@php
+    $pendingBookingsJson = $pendingBookings->map(fn($b) => [
         'title'    => $b->title,
         'user'     => $b->user->name,
         'bookable' => $b->bookable?->name ?? '—',
         'time'     => $b->start_time->format('d/m H:i'),
         'url'      => route('admin.bookings.show', $b),
-    ])),
+    ]);
+@endphp
+@section('content')
+<div class="space-y-6" x-data="{
+    stats: @json($stats),
+    bookings: @json($pendingBookingsJson),
     lastUpdated: '',
     async refresh() {
         try {
