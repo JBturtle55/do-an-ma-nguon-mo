@@ -212,52 +212,6 @@
     </div>
 
     <script>
-    function aiChat() {
-        return {
-            open: false,
-            input: '',
-            messages: [],
-            loading: false,
-
-            async send() {
-                const text = this.input.trim();
-                if (!text || this.loading) return;
-                this.input = '';
-                this.messages.push({ id: Date.now(), role: 'user', content: text });
-                this.loading = true;
-                this.$nextTick(() => this.scrollToBottom());
-
-                try {
-                    const res = await fetch('{{ route('chat.send') }}', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        },
-                        body: JSON.stringify({
-                            message: text,
-                            history: this.messages.slice(-8),
-                        }),
-                    });
-                    const data = await res.json();
-                    this.messages.push({ id: Date.now() + 1, role: 'assistant', content: data.reply || 'Không có phản hồi.' });
-                } catch {
-                    this.messages.push({ id: Date.now() + 1, role: 'assistant', content: 'Lỗi kết nối. Thử lại sau.' });
-                }
-
-                this.loading = false;
-                this.$nextTick(() => this.scrollToBottom());
-            },
-
-            scrollToBottom() {
-                const el = this.$refs.msgArea;
-                if (el) el.scrollTop = el.scrollHeight;
-            },
-        };
-    }
-    </script>
-
-    <script>
     function notificationBell() {
         return {
             count: @json(auth()->user()->unreadNotifications()->count()),
@@ -319,6 +273,48 @@
                     this.items = [];
                     this.count = 0;
                 } catch {}
+            },
+        };
+    }
+
+    function aiChat() {
+        return {
+            open: false,
+            input: '',
+            messages: [],
+            loading: false,
+
+            async send() {
+                const text = this.input.trim();
+                if (!text || this.loading) return;
+                this.input = '';
+                this.messages.push({ id: Date.now(), role: 'user', content: text });
+                this.loading = true;
+                this.$nextTick(() => this.scrollToBottom());
+                try {
+                    const res = await fetch('{{ route('chat.send') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({
+                            message: text,
+                            history: this.messages.slice(-8),
+                        }),
+                    });
+                    const data = await res.json();
+                    this.messages.push({ id: Date.now() + 1, role: 'assistant', content: data.reply || 'Không có phản hồi.' });
+                } catch {
+                    this.messages.push({ id: Date.now() + 1, role: 'assistant', content: 'Lỗi kết nối. Thử lại sau.' });
+                }
+                this.loading = false;
+                this.$nextTick(() => this.scrollToBottom());
+            },
+
+            scrollToBottom() {
+                const el = this.$refs.msgArea;
+                if (el) el.scrollTop = el.scrollHeight;
             },
         };
     }
