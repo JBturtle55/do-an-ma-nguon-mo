@@ -7,19 +7,72 @@
 
     {{-- Stats --}}
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        @foreach([
-            ['Tổng phòng', $stats['total_rooms'], 'text-blue-600'],
-            ['Phòng trống', $stats['available_rooms'], 'text-green-600'],
-            ['Thiết bị', $stats['total_equipment'], 'text-purple-600'],
-            ['Người dùng', $stats['total_users'], 'text-indigo-600'],
-            ['Booking chờ', $stats['pending_bookings'], 'text-yellow-600'],
-            ['Duyệt hôm nay', $stats['today_bookings'], 'text-teal-600'],
-        ] as [$label, $value, $color])
-        <div class="card text-center py-4">
-            <div class="text-2xl font-bold {{ $color }}">{{ $value }}</div>
-            <div class="text-xs text-gray-500 mt-1">{{ $label }}</div>
+        <div class="card flex flex-col items-center gap-2 py-5">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16M9 21h6M3 21h18"/>
+                </svg>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-blue-600">{{ $stats['total_rooms'] }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Tổng phòng</div>
+            </div>
         </div>
-        @endforeach
+        <div class="card flex flex-col items-center gap-2 py-5">
+            <div class="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-green-600">{{ $stats['available_rooms'] }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Phòng trống</div>
+            </div>
+        </div>
+        <div class="card flex flex-col items-center gap-2 py-5">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                </svg>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-purple-600">{{ $stats['total_equipment'] }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Thiết bị</div>
+            </div>
+        </div>
+        <div class="card flex flex-col items-center gap-2 py-5">
+            <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-indigo-600">{{ $stats['total_users'] }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Người dùng</div>
+            </div>
+        </div>
+        <div class="card flex flex-col items-center gap-2 py-5">
+            <div class="w-10 h-10 rounded-xl bg-yellow-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-yellow-600">{{ $stats['pending_bookings'] }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Booking chờ</div>
+            </div>
+        </div>
+        <div class="card flex flex-col items-center gap-2 py-5">
+            <div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+            <div class="text-center">
+                <div class="text-2xl font-bold text-teal-600">{{ $stats['today_bookings'] }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Duyệt hôm nay</div>
+            </div>
+        </div>
     </div>
 
     {{-- Pending bookings --}}
@@ -64,10 +117,38 @@
 
     {{-- Quick links --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <a href="{{ route('admin.rooms.create') }}" class="card text-center hover:shadow-md transition-shadow text-blue-600 font-medium text-sm">+ Thêm phòng</a>
-        <a href="{{ route('admin.equipment.create') }}" class="card text-center hover:shadow-md transition-shadow text-purple-600 font-medium text-sm">+ Thêm thiết bị</a>
-        <a href="{{ route('admin.schedules.create') }}" class="card text-center hover:shadow-md transition-shadow text-green-600 font-medium text-sm">+ Thêm lịch cố định</a>
-        <a href="{{ route('admin.reports.index') }}" class="card text-center hover:shadow-md transition-shadow text-indigo-600 font-medium text-sm">Xem báo cáo</a>
+        <a href="{{ route('admin.rooms.create') }}" class="card flex items-center gap-3 hover:shadow-md transition-shadow group">
+            <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+            </div>
+            <span class="text-sm font-medium text-blue-600">Thêm phòng</span>
+        </a>
+        <a href="{{ route('admin.equipment.create') }}" class="card flex items-center gap-3 hover:shadow-md transition-shadow group">
+            <div class="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-200 transition-colors">
+                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+            </div>
+            <span class="text-sm font-medium text-purple-600">Thêm thiết bị</span>
+        </a>
+        <a href="{{ route('admin.schedules.create') }}" class="card flex items-center gap-3 hover:shadow-md transition-shadow group">
+            <div class="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">
+                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+            </div>
+            <span class="text-sm font-medium text-green-600">Thêm lịch cố định</span>
+        </a>
+        <a href="{{ route('admin.reports.index') }}" class="card flex items-center gap-3 hover:shadow-md transition-shadow group">
+            <div class="w-9 h-9 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-200 transition-colors">
+                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+            </div>
+            <span class="text-sm font-medium text-indigo-600">Xem báo cáo</span>
+        </a>
     </div>
 
     {{-- Overview timetable --}}

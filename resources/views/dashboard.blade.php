@@ -11,21 +11,49 @@
 
     {{-- Stats cards --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="card text-center">
-            <div class="text-3xl font-bold text-yellow-600">{{ $pendingCount }}</div>
-            <div class="text-sm text-gray-500 mt-1">Booking chờ duyệt</div>
+        <div class="card flex items-center gap-4">
+            <div class="w-11 h-11 rounded-xl bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-yellow-600">{{ $pendingCount }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Booking chờ duyệt</div>
+            </div>
         </div>
-        <div class="card text-center">
-            <div class="text-3xl font-bold text-green-600">{{ $approvedCount }}</div>
-            <div class="text-sm text-gray-500 mt-1">Booking đã duyệt</div>
+        <div class="card flex items-center gap-4">
+            <div class="w-11 h-11 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-green-600">{{ $approvedCount }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Booking đã duyệt</div>
+            </div>
         </div>
-        <div class="card text-center">
-            <div class="text-3xl font-bold text-blue-600">{{ $availableRooms }}</div>
-            <div class="text-sm text-gray-500 mt-1">Phòng sẵn sàng</div>
+        <div class="card flex items-center gap-4">
+            <div class="w-11 h-11 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16M9 21h6M3 21h18"/>
+                </svg>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-blue-600">{{ $availableRooms }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Phòng sẵn sàng</div>
+            </div>
         </div>
-        <div class="card text-center">
-            <div class="text-3xl font-bold text-purple-600">{{ $unreadNotifs }}</div>
-            <div class="text-sm text-gray-500 mt-1">Thông báo chưa đọc</div>
+        <div class="card flex items-center gap-4">
+            <div class="w-11 h-11 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+            </div>
+            <div>
+                <div class="text-2xl font-bold text-purple-600">{{ $unreadNotifs }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">Thông báo chưa đọc</div>
+            </div>
         </div>
     </div>
 

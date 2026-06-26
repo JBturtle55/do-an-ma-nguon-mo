@@ -91,16 +91,24 @@
         {{-- Equipment usage --}}
         <div class="card lg:col-span-2">
             <h2 class="font-semibold text-gray-700 mb-4">Sử dụng thiết bị theo danh mục</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                @forelse($equipUsage as $row)
-                <div class="text-center p-3 bg-purple-50 rounded-lg">
-                    <div class="text-xl font-bold text-purple-600">{{ $row->booking_count }}</div>
-                    <div class="text-xs text-gray-500 mt-1">{{ $row->category }}</div>
+            @forelse($equipUsage as $i => $row)
+            @php
+                $pct = $equipUsage->max('booking_count') > 0
+                    ? round(($row->booking_count / $equipUsage->max('booking_count')) * 100)
+                    : 0;
+            @endphp
+            <div class="mb-3">
+                <div class="flex justify-between text-sm mb-1">
+                    <span class="text-gray-700 font-medium truncate">{{ $row->category }}</span>
+                    <span class="text-gray-500 ml-2 flex-shrink-0">{{ $row->booking_count }} lần</span>
                 </div>
-                @empty
-                <p class="col-span-4 text-gray-400 text-sm">Không có dữ liệu.</p>
-                @endforelse
+                <div class="w-full bg-gray-100 rounded-full h-2">
+                    <div class="bg-purple-500 h-2 rounded-full transition-all" style="width: {{ $pct }}%"></div>
+                </div>
             </div>
+            @empty
+            <p class="text-gray-400 text-sm">Không có dữ liệu.</p>
+            @endforelse
         </div>
     </div>
 </div>

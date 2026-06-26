@@ -71,8 +71,7 @@
                     <tr>
                         <th class="table-th">Tiêu đề</th>
                         <th class="table-th">Đối tượng</th>
-                        <th class="table-th">Bắt đầu</th>
-                        <th class="table-th">Kết thúc</th>
+                        <th class="table-th">Thời gian</th>
                         <th class="table-th">Trạng thái</th>
                         <th class="table-th">Thao tác</th>
                     </tr>
@@ -86,8 +85,9 @@
                                 </a>
                             </td>
                             <td class="table-td text-gray-500">{{ $booking->bookable?->name ?? '—' }}</td>
-                            <td class="table-td">{{ $booking->start_time->format('d/m/Y H:i') }}</td>
-                            <td class="table-td">{{ $booking->end_time->format('d/m/Y H:i') }}</td>
+                            <td class="table-td text-gray-500 whitespace-nowrap">
+                                {{ $booking->start_time->format('d/m/Y H:i') }} – {{ $booking->end_time->format('H:i') }}
+                            </td>
                             <td class="table-td"><x-badge :status="$booking->status"/></td>
                             <td class="table-td">
                                 <a href="{{ route('bookings.show', $booking) }}" class="text-blue-600 text-xs hover:underline">Chi tiết</a>
